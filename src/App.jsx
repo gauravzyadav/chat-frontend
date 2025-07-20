@@ -13,6 +13,19 @@ const App = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState('');
 
+  // Restore session on load
+  useEffect(() => {
+    const savedRoom = localStorage.getItem('room');
+    const savedUsername = localStorage.getItem('username');
+
+    if (savedRoom && savedUsername) {
+      setRoom(savedRoom);
+      setUsername(savedUsername);
+      socket.emit('join_room', { roomCode: savedRoom, username: savedUsername });
+    }
+  }, []);
+
+  // Setup socket events
   useEffect(() => {
     socket.on('connect', () => setIsConnected(true));
     socket.on('disconnect', () => setIsConnected(false));
@@ -24,6 +37,8 @@ const App = () => {
       setRoom(roomCode);
       setIsAdmin(isAdmin);
       setJoined(true);
+      localStorage.setItem('room', roomCode);
+      localStorage.setItem('username', username);
     });
 
     socket.on('joined_room', ({ isAdmin }) => {
@@ -34,8 +49,8 @@ const App = () => {
     socket.on('room_exists', () => setError('Room already exists.'));
     socket.on('room_not_found', () => setError('Room not found.'));
     socket.on('room_deleted', () => {
-      alert('Room was deleted by admin.');
-      window.location.reload();
+      alert('Room was deleted by the admin.');
+      leaveRoom();
     });
 
     return () => {
@@ -49,33 +64,38 @@ const App = () => {
       socket.off('room_not_found');
       socket.off('room_deleted');
     };
-  }, []);
+  }, [username]);
 
-  const handleJoin = () => {
+  const joinRoom = () => {
     setError('');
     if (username && room) {
+      localStorage.setItem('room', room);
+      localStorage.setItem('username', username);
       socket.emit('join_room', { roomCode: room, username });
     }
   };
 
   const handleCreate = () => {
     setError('');
-  
     if (!username.trim()) {
       setError('Please enter your username before creating a room.');
       return;
     }
-  
     const newRoom = Math.random().toString(36).substring(2, 8);
-    setRoom(newRoom); // So it's shown in the UI
+    setRoom(newRoom);
     socket.emit('create_room', { roomCode: newRoom, username });
   };
-  
 
   const handleDelete = () => {
     if (window.confirm('Are you sure you want to delete this room?')) {
       socket.emit('delete_room', room);
     }
+  };
+
+  const leaveRoom = () => {
+    localStorage.removeItem('room');
+    localStorage.removeItem('username');
+    window.location.reload();
   };
 
   const sendMessage = () => {
@@ -117,7 +137,7 @@ const App = () => {
             />
 
             <button
-              onClick={handleJoin}
+              onClick={joinRoom}
               className="bg-black text-white px-4 py-2 rounded w-full"
             >
               Join Room
@@ -136,14 +156,22 @@ const App = () => {
           <>
             <div className="flex justify-between mb-2">
               <h2 className="font-semibold">Room: {room}</h2>
-              {isAdmin && (
+              <div className="space-x-2">
+                {isAdmin && (
+                  <button
+                    onClick={handleDelete}
+                    className="text-red-600 text-sm hover:underline"
+                  >
+                    Delete Room
+                  </button>
+                )}
                 <button
-                  onClick={handleDelete}
-                  className="text-red-600 text-sm hover:underline"
+                  onClick={leaveRoom}
+                  className="text-gray-600 text-sm hover:underline"
                 >
-                  Delete Room
+                  Leave Room
                 </button>
-              )}
+              </div>
             </div>
 
             <div className="bg-gray-100 p-4 rounded shadow h-64 overflow-y-auto mb-4">
