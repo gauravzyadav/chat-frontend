@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { io } from 'socket.io-client';
 import {
   SignedIn,
@@ -8,12 +9,16 @@ import {
   useUser,
   useAuth
 } from '@clerk/clerk-react';
+const env_type = import.meta.env.VITE_ENV_TYPE;
+const backend_url = env_type === 'PROD'
+  ? import.meta.env.VITE_DEPLOYED_SERVER_URL
+  : import.meta.env.VITE_LOCAL_SERVER_URL;
 
-// 👇 Disable auto connect
-const socket = io('http://localhost:3000', {
+const socket = io(backend_url, {
   autoConnect: false,
-  transports: ['websocket']
+  transports: ['websocket'],
 });
+
 
 const Chat = ({ user }) => {
   const { getToken } = useAuth();
