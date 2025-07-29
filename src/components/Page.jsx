@@ -9,7 +9,7 @@ const LandingPage = ({ showSignIn, setShowSignIn }) => {
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <span className="text-2xl">💬</span>
-            <span className="text-xl font-bold text-gray-900">Chat Haven</span>
+            <span className="text-xl font-bold text-gray-900">The Chat Haven</span>
           </div>
           <div className="space-x-4">
             <button
