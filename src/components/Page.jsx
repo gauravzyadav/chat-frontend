@@ -12,7 +12,7 @@ const LandingPage = ({ showSignIn, setShowSignIn }) => {
               <span className="text-2xl">💬</span>
             </div>
             <div>
-              <span className="text-xl font-bold text-gray-900">Chat Haven</span>
+              <span className="text-xl font-bold text-gray-900">The Chat Haven</span>
               <p className="text-xs text-gray-500">Connect • Chat • Create</p>
             </div>
           </div>
