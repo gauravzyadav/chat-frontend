@@ -33,7 +33,7 @@ const Chat = ({ user }) => {
         console.error("❌ Failed to get JWT token from Clerk.")
         return
       }
-      console.log("✅ Clerk Token:", token)
+     // console.log("✅ Clerk Token:", token)
       socket.auth = { token }
       socket.connect()
     }
